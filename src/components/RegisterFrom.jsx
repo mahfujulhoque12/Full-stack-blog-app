@@ -64,7 +64,6 @@ const RegisterForm = () => {
             type="email"
             {...register('email', {
               required: 'Email is required',
-              pattern: { value: /\S+@\S+\.\S+/, message: 'Invalid email address' },
             })}
             className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Enter your email"
