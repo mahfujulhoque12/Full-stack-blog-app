@@ -1,26 +1,31 @@
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router'; // Update to react-router-dom
+import { Link } from 'react-router-dom'; // ✅ Fixed import
 import axios from 'axios';
-import { useState } from 'react'; // Add useState
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 const RegisterForm = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const [serverError, setServerError] = useState(''); // State for server errors
+  const [serverError, setServerError] = useState('');
+  const navigate = useNavigate()
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('/api/auth/register', data);
-      console.log(response, 'response');
-      setServerError(''); // Clear any previous errors
-      // Optionally, redirect or show success message
+       await axios.post('/api/auth/register', data);
+       navigate("/login")
+      
+      setServerError('');
+      // Redirect or success message here if needed
     } catch (error) {
       console.log(error, 'error here');
-      // Extract and display server error message
-      if (error.response && error.response.status === 409) {
-        setServerError('A user with this email or username already exists.');
-      } else {
-        setServerError('An error occurred. Please try again later.');
-      }
+
+      // ✅ Extract error message safely
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Something went wrong';
+
+      setServerError(message);
     }
   };
 
@@ -62,9 +67,7 @@ const RegisterForm = () => {
           <input
             id="email"
             type="email"
-            {...register('email', {
-              required: 'Email is required',
-            })}
+            {...register('email', { required: 'Email is required' })}
             className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Enter your email"
           />
@@ -97,8 +100,9 @@ const RegisterForm = () => {
           Register
         </button>
 
-        <p className="text-sm font-normal mt-4">
-          Already have an account? <Link to="/login" className="font-semibold text-blue-500">Login</Link>
+        <p className="text-sm font-normal mt-4 text-center">
+          Already have an account?{' '}
+          <Link to="/login" className="font-semibold text-blue-500">Login</Link>
         </p>
       </form>
     </div>
