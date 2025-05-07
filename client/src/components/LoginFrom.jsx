@@ -1,23 +1,47 @@
 
 
+import axios from 'axios';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 
 const LoginForm = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [serverError, setServerError] = useState('');
+  const navigate = useNavigate()
+  const onSubmit = async (data) => {
+    try {
+       await axios.post('/api/auth/login', data);
+       navigate("/")
+      
+      setServerError('');
+      // Redirect or success message here if needed
+    } catch (error) {
+      console.log(error, 'error here');
 
-  const onSubmit = (data) => {
-    console.log('Form Data:', data);
-    // login logic goes here
+      // ✅ Extract error message safely
+      const message =
+      error?.response?.data?.message || // ✅ new preferred
+      error?.response?.data?.error ||   // ✅ fallback to "error"
+      error?.message ||
+      'Something went wrong';
+    
+
+      setServerError(message);
+    }
   };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
+         {/* Display server error */}
+         {serverError && (
+          <p className="text-red-500 text-sm mb-4 text-center">{serverError}</p>
+        )}
+
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
         <div className="mb-4">
